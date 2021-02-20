@@ -3,6 +3,8 @@
 const User = require('../models/User')
 const Post = require('../models/Post')
 const { SECRET_KEY } = require('../secret/secretKey')
+const { UserInputError } = require('apollo-server')
+const { registerInputsValidation } = require('../util/registerInputsValidation')
 
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -79,6 +81,20 @@ module.exports = {
         password,
         createdAt: new Date().toISOString()
       });
+
+      // VALIDATION
+
+      // existing user validation
+      const existingUser = await User.findOne({ username })
+      if (existingUser) {
+        throw new UserInputError('Username is taken')
+      }
+
+      // existing email validation
+      const existingEmail = await User.findOne({ email })
+      if (existingEmail) {
+        throw new UserInputError('Email is taken')
+      }
 
       const res = await newUser.save();
 
