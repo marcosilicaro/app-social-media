@@ -84,6 +84,17 @@ module.exports = {
 
       // VALIDATION
 
+      // empty user?
+      const { valid, errors } = registerInputsValidation(
+        username,
+        email,
+        password,
+        confirmPassword
+      );
+      if (!valid) {
+        throw new UserInputError('Errors', { errors });
+      }
+
       // existing user validation
       const existingUser = await User.findOne({ username })
       if (existingUser) {
