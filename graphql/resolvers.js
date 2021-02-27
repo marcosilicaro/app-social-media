@@ -5,6 +5,7 @@ const Post = require('../models/Post')
 const { SECRET_KEY } = require('../secret/secretKey')
 const { UserInputError } = require('apollo-server')
 const { registerInputsValidation } = require('../util/registerInputsValidation')
+const { loginValidator } = require('../util/loginValidator')
 
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -115,6 +116,33 @@ module.exports = {
       return {
         ...res._doc,
         id: res._id,
+        token
+      };
+    },
+    async loginUser(
+      _,
+      {
+        username, password
+      }
+    ) {
+
+      // existing user?
+      const existingUser = await User.findOne({ username })
+      if (!existingUser) {
+        throw new UserInputError('There are no users with that username')
+      }
+
+      // password correct?
+      const matchingPasswords = await bcrypt.compare(password, existingUser.password)
+      if (!matchingPasswords) {
+        throw new UserInputError('Wrong Credentials')
+      }
+
+      const token = generateToken(existingUser)
+
+      return {
+        ...existingUser._doc,
+        id: existingUser._id,
         token
       };
     }

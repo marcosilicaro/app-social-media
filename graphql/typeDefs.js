@@ -6,10 +6,8 @@ const gql = require('graphql-tag')
 module.exports = gql`
   type User {
     id: ID!
-    name: String!
     email: String!
     username: String!
-    password: String!
     createdAt: String!
     token: String!
   }
@@ -47,6 +45,7 @@ module.exports = gql`
     getUser(userId: ID!): User
   }
   type Mutation{
-    registerUser(registerInput: RegisterInput): User!
+    registerUser(registerInput: RegisterInput): User!,
+    loginUser(username: String!, password: String!): User!
   }
 `

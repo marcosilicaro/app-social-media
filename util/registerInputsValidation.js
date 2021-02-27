@@ -28,9 +28,9 @@ module.exports.registerInputsValidation = (
     }
 
     // empty password?
-    if (password !== confirmPassword) {
-        errors.confirmPassword = 'Passwords must match';
-    }
+    // if (password !== confirmPassword) {
+    //    errors.confirmPassword = 'Passwords must match';
+    // }
 
     return {
         errors,
