@@ -5,7 +5,8 @@ const Post = require('../models/Post')
 const { SECRET_KEY } = require('../secret/secretKey')
 const { UserInputError } = require('apollo-server')
 const { registerInputsValidation } = require('../util/registerInputsValidation')
-const { loginValidator } = require('../util/loginValidator')
+const checkAuth = require('../util/check-auth')
+const { AuthenticationError } = require('apollo-server')
 
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -145,6 +146,42 @@ module.exports = {
         id: existingUser._id,
         token
       };
+    },
+    async createPost(
+      _, { title, content }, context
+    ) {
+
+      const user = checkAuth(context);
+
+      const newPost = new Post({
+        title,
+        content,
+        user: user.id,
+        username: user.username,
+        createdAt: new Date().toISOString()
+      });
+
+      const post = await newPost.save();
+
+      return post;
+
+    },
+    async deletePost(
+      _, { postId }, context
+    ) {
+      const user = checkAuth(context);
+      try {
+        const post = await Post.findById(postId);
+        if (user.username === post.username) {
+          await post.delete();
+          return 'Post deleted successfully';
+        } else {
+          throw new AuthenticationError('Action not allowed');
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+
     }
   }
 }

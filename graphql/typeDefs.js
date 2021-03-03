@@ -46,6 +46,11 @@ module.exports = gql`
   }
   type Mutation{
     registerUser(registerInput: RegisterInput): User!,
-    loginUser(username: String!, password: String!): User!
+    loginUser(username: String!, password: String!): User!,
+    createPost(title: String!, content: String!): Post!,
+    deletePost(postId: String!): String!
+  }
+  type Subscription {
+    newPost: Post!
   }
 `
